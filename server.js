@@ -84,7 +84,7 @@ app.get('/login', function(req, res) {
 app.post('/setup', function(req, res) {
 
     User.findOne({
-        email: req.body.email + '@avenuecode.com'
+        email: req.body.email
     }, function(err, user) {
         if (err) throw err;
 
@@ -92,7 +92,7 @@ app.post('/setup', function(req, res) {
 
           var user = new User({
             name: req.body.name,
-            email: req.body.email + '@avenuecode.com',
+            email: req.body.email,
             password: req.body.password,
             admin: false
         });
@@ -100,8 +100,10 @@ app.post('/setup', function(req, res) {
             user.save(function(err) {
               if (err) throw err;
               console.log('User saved successfully');
+              user.password = '';
               res.json({
-                success: true
+                success: true,
+                user: user
               });
             });
         } else {
@@ -124,7 +126,7 @@ apiRoutes.post('/authenticate', function(req, res) {
 
   // find the user
   User.findOne({
-    email: req.body.email + '@avenuecode.com'
+    email: req.body.email
   }, function(err, user) {
 
     if (err) throw err;
@@ -332,7 +334,7 @@ apiRoutes.put('/quit/:userid', function(req, res) {
 
 
       } else {
-        res.json({ success: false, message: 'You are already registered!' });
+        res.json({ success: false, message: 'You are not registered!' });
       } 
       
     }
