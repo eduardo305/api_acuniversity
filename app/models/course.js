@@ -12,5 +12,6 @@ module.exports = mongoose.model('Course', new Schema({
 	classes: [{
 		type: Schema.Types.ObjectId,
 		ref: 'Class'
-	}]
+	}],
+	available: Boolean
 }));
