@@ -12,4 +12,5 @@ module.exports = mongoose.model('Class', new Schema({
 	available: Boolean,
 	startdate: {type: Date, default: Date.now},
     enddate: {type: Date, default: Date.now},
+    isFull: {type: Boolean, default: false}
 }));

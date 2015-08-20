@@ -271,6 +271,26 @@ apiRoutes.get('/students/:classroomid', function(req, res) {
   }).select('-admin -password');
 });
 
+apiRoutes.put('/classrooms/availability/:classroomid', function(req, res) {
+  Class.findOne({
+    _id: req.params.classroomid
+  }, function(err, classroom) {
+    if (err) throw err;
+
+    if (classroom) {
+      classroom.isFull = req.body.isFull;
+
+      classroom.save(function(err) {
+        if (err) throw err;
+
+        res.json({ success: true, classroom: classroom });
+      });
+    } else {
+      console.log('Classroom not found');
+    }
+  });
+});
+
 // Register/Unregister in a course
 apiRoutes.put('/register/:userid', function(req, res) {
   User.findOne({
