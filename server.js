@@ -7,11 +7,12 @@ var bodyParser  = require('body-parser');
 var morgan      = require('morgan');
 var mongoose    = require('mongoose');
 
-var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
-var config = require('./config'); // get our config file
-var User   = require('./app/models/user'); // get our mongoose model
-var Course = require('./app/models/course'); // get our mongoose model
-var Class  = require('./app/models/class'); // get our mongoose model
+var jwt      = require('jsonwebtoken'); // used to create, sign, and verify tokens
+var config   = require('./config'); // get our config file
+var User     = require('./app/models/user'); // get our mongoose model
+var Course   = require('./app/models/course'); // get our mongoose model
+var Class    = require('./app/models/class'); // get our mongoose model
+var Comment  = require('./app/models/comment'); // get our mongoose model
     
 // =======================
 // configuration =========
@@ -240,7 +241,7 @@ apiRoutes.get('/users', function(req, res) {
 apiRoutes.get('/courses/:courseid', function(req, res) {
   Course.find({_id: req.params.courseid}, function(err, course) {
     res.json({success: true, course: course});
-  }).populate('hosts', '-password -admin -courses -classrooms').populate('classes');
+  }).populate('hosts', '-password -admin -courses -classrooms').populate('classes').populate('comments');
 });
 
 // Fetch all courses
@@ -352,7 +353,6 @@ apiRoutes.put('/quit/:userid', function(req, res) {
             });
         });
 
-
       } else {
         res.json({ success: false, message: 'You are not registered!' });
       } 
@@ -361,6 +361,39 @@ apiRoutes.put('/quit/:userid', function(req, res) {
   });
 });
 
+// Fetch all comments from a specific course
+apiRoutes.get('/comments/:courseid', function(req, res) {
+  Comment.find({course: req.params.courseid}, function(err, comments) {
+    res.json(comments);
+  }).sort({date: 'desc'}).select('-user');
+});
+
+// Post a comment to a specific course
+apiRoutes.post('/comments/:courseid', function(req, res) {
+  Course.findOne({
+    _id: req.params.courseid
+  }, function(err, course) {
+    if (err) throw err;
+
+    if (!course) {
+      res.json({ success: false, message: 'Comment failed. Course not found.' });
+    } else {
+      var comment = new Comment({
+        comment: req.body.comment,
+        user: req.body.user,
+        course: req.params.courseid
+      });
+
+      comment.save(function(err) {
+        if (err) throw err;
+
+        res.json({success: true, comment: comment});
+      });
+    }
+  });
+
+
+});
 
 // apply the routes to our application with the prefix /api
 app.use('/api', apiRoutes);
