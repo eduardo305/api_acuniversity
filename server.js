@@ -248,7 +248,7 @@ apiRoutes.get('/courses/:courseid', function(req, res) {
 apiRoutes.get('/courses', function(req, res) {
   Course.find({}, function(err, courses) {
     res.json({success: true, courses: courses});
-  }).populate('hosts', '-password -admin -courses').populate('classes');
+  }).sort({'insertdate': 'desc'}).populate('hosts', '-password -admin -courses').populate('classes');
 });
 
 /*apiRoutes.get('/courses', function(req, res) {
