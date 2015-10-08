@@ -13,6 +13,5 @@ module.exports = mongoose.model('Course', new Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'Class'
 	}],
-	insertdate: {type: Date, default: Date.now},
 	available: Boolean
 }));
