@@ -46,6 +46,41 @@ module.exports = function(app, User, Course) {
 	  });
 	});
 
+	// Route to register a new user
+	apiRoutes.post('/setup', function(req, res) {
+
+	    User.findOne({
+	        email: req.body.email
+	    }, function(err, user) {
+	        if (err) throw err;
+
+	        if (!user) {
+
+	          var user = new User({
+	            name: req.body.name,
+	            email: req.body.email,
+	            password: req.body.password,
+	            admin: false
+	        });
+
+	            user.save(function(err) {
+	              if (err) throw err;
+	              console.log('User saved successfully');
+	              user.password = '';
+	              res.json({
+	                success: true,
+	                user: user
+	              });
+	            });
+	        } else {
+	            res.json({
+	                success: false,
+	                message: 'User already exists!'
+	            })
+	        }
+	    });
+	});
+
 	// Fetch all (full) users
 	apiRoutes.get('/users', jwtauth.isAuthenticated, function(req, res) {
 
