@@ -3,6 +3,7 @@ var jwtauth 	= require('./auth');
 var config      = require('../../config');
 
 var express     = require('express');
+var nodemailer  = require('nodemailer');
 var apiRoutes 	= express.Router();
 
 module.exports = function(app, User, Course) {
@@ -79,6 +80,33 @@ module.exports = function(app, User, Course) {
 	            })
 	        }
 	    });
+	});
+
+	// Route for remember user's password
+	apiRoutes.post('/rememberme', function(req, res) {
+		var transporter = nodemailer.createTransport();
+
+		console.log(req.body.email);
+
+		User.findOne({
+		    email: req.body.email
+		  }, function(err, user) {
+
+		  	if (err) throw err;
+
+		  	if (!user) {
+		  		res.json({ success: false, message: 'User not found!' });
+		  	} else {
+		  		transporter.sendMail({
+					from: 'esilva@avenuecode.com',
+					to: 'esilva@avenuecode.com',
+					subject: '[AC University] Password retrieval',
+					html: 'Recently you have requested to be reminded of your password. <br>Here is your Your password again: <b>' + user.password + '<br></b>If you didn\'t requested it, please reach out to the AC University administrator.'
+				});
+
+				res.json({success: true, message: 'Email sent!'});
+		  	}
+		});
 	});
 
 	// Fetch all (full) users
